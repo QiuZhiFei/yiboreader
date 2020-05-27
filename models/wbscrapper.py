@@ -16,6 +16,12 @@ import binascii
 import time
 import logging
 
+import lxml.html as HTML
+from lxml.etree import tostring
+
+# SEARCH_URL = 'http://s.weibo.com/weibo/{kw}&typeall=1&suball=1&page={page}'
+SEARCH_URL = 'https://s.weibo.com/weibo/{kw}?topnav=1&wvr=6&b=1&page={page}'
+
 class WeiboLogin(object):
     def __init__(self,username,password):
         self._username = username
@@ -133,6 +139,91 @@ class WeiboLogin(object):
             except:
                 logging.debug('Weibo Login Fail!')
                 return  False
+
+
+    def search(self, kw, page=1):
+        # 获取需要的 html 代码
+        resp = self.session.get(SEARCH_URL.format(kw=kw, page=page))
+
+        content_re = re.compile(r'\d+')
+        m = resp.text
+
+        # content_re = re.compile(r'"html":.*div.*search_feed.*"')
+        # m = content_re.search(resp.text)
+
+        raw_text = resp.text
+        text = resp.text
+
+        # 处理数据获得需要的信息
+        data = []
+        etree = HTML.fromstring(text)
+        # wbboxes = etree.xpath('//div[@class="WB_cardwrap S_bg2 clearfix"]')
+        wbboxes = etree.xpath('//div[@class="card-feed"]')
+        wbboxes = [wbboxes[0]]
+        print(text)
+        for box in wbboxes:
+            feed = box.xpath('//p[@class="txt"]')
+            print('=======')
+            print(tostring(feed[0]))
+            print('=======')
+            print('--------')
+            print(tostring(box))
+            print('--------')
+            # print(box.text_content())
+            for f in feed:
+                print(f.text_content())
+            # print(feed)
+        #     print(feed)
+
+
+        # print('---------')
+        # print(text)
+        # print(wbboxes)
+        # print('---------')
+
+        return
+        
+
+        for box in wbboxes:
+            mid = box.xpath(
+                './div/@mid'
+            )[0].strip()
+
+            user_name = box.xpath(
+                './/div[@class="feed_content wbcon"]/a/@nick-name'
+            )[0].strip()
+
+            wbtext = box.xpath(
+                'string(.//p[@class="comment_txt"])'
+            )
+            wbtext = ''.join(wbtext).strip()
+
+            image_urls = box.xpath(
+                './/div[@class="media_box"]//li/img[@class="bigcursor"]/@src'
+            )
+            image_url = get_large_pic(
+                image_urls[0].strip()) if image_urls else ''
+
+            url = box.xpath(
+                './/div[@class="feed_from W_textb"]/a[@class="W_textb"]/@href'
+            )[0].strip()
+            # url = url.replace('weibo.com', 'm.weibo.cn')
+
+            ctime = box.xpath(
+                './/div[@class="feed_from W_textb"]/a[@class="W_textb"]/@title'
+            )[0].strip()
+
+            d = {
+                'mid': int(mid),
+                'user_name': user_name,
+                'text': wbtext,
+                'image_url': image_url,
+                'url': url,
+                'time': ctime
+            }
+
+            data.append(d)
+        return data
                 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG, format="%(asctime)s\t%(levelname)s\t%(message)s")

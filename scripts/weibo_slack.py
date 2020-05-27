@@ -33,8 +33,29 @@ def main():
     logging.basicConfig(level=logging.DEBUG, format="%(asctime)s\t%(levelname)s\t%(message)s")
     username = WB_ACCOUNT
     password = WB_PASSWD
-    A = WeiboLogin(username=username,password=password)
-    A.Login()
+    client = WeiboLogin(username=username,password=password)
+    client.Login()
+
+    #############################
+
+
+    data = client.search('仇志飞')
+    print(data)
+
+    # config = CONFIG.get(product)
+    # if not config:
+    #     return
+
+    # name = config['name']
+    # keywords = config['keywords']
+    # banwords = config['banwords']
+    # dbkey_end_mid = config['dbkey']
+    # maxpage = config['maxpage']
+
+
+
+
+    #############################
 
 if __name__ == '__main__':
     main()
