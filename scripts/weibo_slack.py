@@ -39,7 +39,7 @@ def main():
     #############################
 
 
-    data = client.search('仇志飞')
+    data = client.search('FROM:彼岸暑假吉他课《和老杨一起玩吉他')
     print(data)
 
     # config = CONFIG.get(product)

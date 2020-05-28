@@ -158,22 +158,31 @@ class WeiboLogin(object):
         data = []
         etree = HTML.fromstring(text)
         # wbboxes = etree.xpath('//div[@class="WB_cardwrap S_bg2 clearfix"]')
-        wbboxes = etree.xpath('//div[@class="card-feed"]')
+        # wbboxes = etree.xpath('//div[@class="card-feed"]//p[@class="txt"]')
+        # wbboxes = etree.xpath('//div[@class="card-feed"]')
+        wbboxes = etree.xpath('//div[@action-type="feed_list_item"]')
+        # wbboxes = etree.xpath('//div/@mid')
         wbboxes = [wbboxes[0]]
-        print(text)
+        # print(text)
         for box in wbboxes:
-            feed = box.xpath('//p[@class="txt"]')
-            print('=======')
-            print(tostring(feed[0]))
-            print('=======')
-            print('--------')
-            print(tostring(box))
-            print('--------')
-            # print(box.text_content())
-            for f in feed:
-                print(f.text_content())
+            mid = box.xpath('.//@mid')[0]
+            user_name = box.xpath('.//@nick-name')[0]
+            wbtext = box.xpath('.//p[@class="txt"]')[0].text_content()
+
+            origin_image_urls = box.xpath('.//div[@class="media media-piclist"]//img/@src')
+            image_urls = []
+            for image_url in origin_image_urls:
+                image_urls.append('http:' + image_url)
+            print(image_urls)
+
+            # mid = box.xpath('.//@mid')[0].strip()
             # print(feed)
-        #     print(feed)
+            # feed = box.xpath('.//div[@action-type="feed_list_item"]')[0]
+            # print(box.text_content())
+
+            # content
+            # content = box.xpath('.//p[@class="txt"]')[0]
+            # print(content.text_content())
 
 
         # print('---------')
