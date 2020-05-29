@@ -157,70 +157,22 @@ class WeiboLogin(object):
         # 处理数据获得需要的信息
         data = []
         etree = HTML.fromstring(text)
-        # wbboxes = etree.xpath('//div[@class="WB_cardwrap S_bg2 clearfix"]')
-        # wbboxes = etree.xpath('//div[@class="card-feed"]//p[@class="txt"]')
-        # wbboxes = etree.xpath('//div[@class="card-feed"]')
+
         wbboxes = etree.xpath('//div[@action-type="feed_list_item"]')
-        # wbboxes = etree.xpath('//div/@mid')
-        wbboxes = [wbboxes[0]]
-        # print(text)
         for box in wbboxes:
             mid = box.xpath('.//@mid')[0]
             user_name = box.xpath('.//@nick-name')[0]
             wbtext = box.xpath('.//p[@class="txt"]')[0].text_content()
 
+
             origin_image_urls = box.xpath('.//div[@class="media media-piclist"]//img/@src')
             image_urls = []
             for image_url in origin_image_urls:
                 image_urls.append('http:' + image_url)
-            print(image_urls)
 
-            # mid = box.xpath('.//@mid')[0].strip()
-            # print(feed)
-            # feed = box.xpath('.//div[@action-type="feed_list_item"]')[0]
-            # print(box.text_content())
+            url = box.xpath('.//p[@class="from"]/a/@href')[0]
 
-            # content
-            # content = box.xpath('.//p[@class="txt"]')[0]
-            # print(content.text_content())
-
-
-        # print('---------')
-        # print(text)
-        # print(wbboxes)
-        # print('---------')
-
-        return
-        
-
-        for box in wbboxes:
-            mid = box.xpath(
-                './div/@mid'
-            )[0].strip()
-
-            user_name = box.xpath(
-                './/div[@class="feed_content wbcon"]/a/@nick-name'
-            )[0].strip()
-
-            wbtext = box.xpath(
-                'string(.//p[@class="comment_txt"])'
-            )
-            wbtext = ''.join(wbtext).strip()
-
-            image_urls = box.xpath(
-                './/div[@class="media_box"]//li/img[@class="bigcursor"]/@src'
-            )
-            image_url = get_large_pic(
-                image_urls[0].strip()) if image_urls else ''
-
-            url = box.xpath(
-                './/div[@class="feed_from W_textb"]/a[@class="W_textb"]/@href'
-            )[0].strip()
-            # url = url.replace('weibo.com', 'm.weibo.cn')
-
-            ctime = box.xpath(
-                './/div[@class="feed_from W_textb"]/a[@class="W_textb"]/@title'
-            )[0].strip()
+            ctime = box.xpath('.//p[@class="from"]/a/text()')[0]
 
             d = {
                 'mid': int(mid),
