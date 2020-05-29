@@ -160,9 +160,9 @@ class WeiboLogin(object):
 
         wbboxes = etree.xpath('//div[@action-type="feed_list_item"]')
         for box in wbboxes:
-            mid = box.xpath('.//@mid')[0]
-            user_name = box.xpath('.//@nick-name')[0]
-            wbtext = box.xpath('.//p[@class="txt"]')[0].text_content()
+            mid = box.xpath('.//@mid')[0].strip()
+            user_name = box.xpath('.//@nick-name')[0].strip()
+            wbtext = box.xpath('.//p[@class="txt"]')[0].text_content().strip()
 
 
             origin_image_urls = box.xpath('.//div[@class="media media-piclist"]//img/@src')
@@ -170,15 +170,15 @@ class WeiboLogin(object):
             for image_url in origin_image_urls:
                 image_urls.append('http:' + image_url)
 
-            url = box.xpath('.//p[@class="from"]/a/@href')[0]
+            url = box.xpath('.//p[@class="from"]/a/@href')[0].strip()
 
-            ctime = box.xpath('.//p[@class="from"]/a/text()')[0]
+            ctime = box.xpath('.//p[@class="from"]/a/text()')[0].strip()
 
             d = {
                 'mid': int(mid),
                 'user_name': user_name,
                 'text': wbtext,
-                'image_url': image_url,
+                'image_urls': image_urls,
                 'url': url,
                 'time': ctime
             }

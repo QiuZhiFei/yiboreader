@@ -5,3 +5,7 @@ WB_PASSWD = 'qiuzhifei131'
 
 FM_CHL = '#fm-feedback'
 DONGXI_CHL = '#dongxi'
+
+DB_PATH = 'db.json'
+
+PRE_MID = 'pre_mid'

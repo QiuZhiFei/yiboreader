@@ -5,7 +5,13 @@ import sys
 from datetime import datetime
 
 from models.wbscrapper import WeiboLogin
-from models.consts import WB_ACCOUNT, WB_PASSWD, FM_CHL, DONGXI_CHL
+from models.consts import WB_ACCOUNT, WB_PASSWD, FM_CHL, DONGXI_CHL, DB_PATH, PRE_MID
+
+import pickledb
+
+
+path = sys.path[0] + '/' + DB_PATH
+db = pickledb.load(path, False)
 
 CONFIG = {
     'fm': {
@@ -29,7 +35,13 @@ CONFIG = {
     },
 }
 
-def main():
+
+def get_msgs(product='fm'):
+    config = CONFIG[product]
+    if not config:
+
+        return []
+
     logging.basicConfig(level=logging.DEBUG, format="%(asctime)s\t%(levelname)s\t%(message)s")
     username = WB_ACCOUNT
     password = WB_PASSWD
@@ -38,22 +50,46 @@ def main():
 
     #############################
 
+    name = config['name']
+    keywords = config['keywords']
+    banwords = config['banwords']
+    dbkey_end_mid = config['dbkey']
+    maxpage = config['maxpage']
 
-    data = client.search('FROM:彼岸暑假吉他课《和老杨一起玩吉他')
-    print(data)
+    #############################
 
-    # config = CONFIG.get(product)
-    # if not config:
-    #     return
+    data = []
+    pre_pid = db.get(PRE_MID) or '0'
 
-    # name = config['name']
-    # keywords = config['keywords']
-    # banwords = config['banwords']
-    # dbkey_end_mid = config['dbkey']
-    # maxpage = config['maxpage']
+    for page in range(1, max_page + 1):
+        result = client.search(name, page)
+        if not result:
+            break
+
+        end = False
+        for msg in result:
+            if int(msg['mid']) > int(pre_pid):
+                print(msg['text'])
+                data.append(msg)
+            else:
+                end = True
+                break
+        if end:
+            break
+    
+    if data:
+        data.sort(key=lambda x: x['mid'])
+        db.set(PRE_MID, data[-1]['mid'])
+        db.dump()
+    
+    return data
+
+def main():
+    get_msgs()
 
 
-
+    # data = client.search('王一博')
+    # print(data)
 
     #############################
 
